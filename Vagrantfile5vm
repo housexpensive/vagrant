@@ -65,15 +65,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     machine.vm.host_name="node1"
     machine.vm.network :private_network, ip:"192.168.33.13"
     machine.vm.provision "shell",inline: $docker_script
-    machine.memory = 512
-    machine.cpus = 1
+    machine.vm.provider "virtualbox" do |v|
+      v.memory = 512
+      v.cpus = 1
+    end
   end
   config.vm.define "node2" do |machine|
     machine.vm.host_name="node2"
     machine.vm.network :private_network, ip:"192.168.33.14"
     machine.vm.provision "shell",inline: $docker_script
-    machine.memory = 512
-    machine.cpus = 1
+    machine.vm.provider "virtualbox" do |v|
+      v.memory = 512
+      v.cpus = 1
+    end
   end
   config.vm.define "mongodb1" do |machine|
     machine.vm.host_name="mongodb1"
