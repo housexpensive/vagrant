@@ -2,10 +2,10 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/xenial64"
   config.ssh.insert_key = false
-  config.ssh.private_key_path = ["C:/Users/somma/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
-  config.vm.provision "file", source: "C:/Users/somma/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
-  config.vm.provision "file", source: "C:/Users/somma/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-  config.vm.provision "file", source: "C:/Users/somma/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+  config.ssh.private_key_path = ["C:/Users/USER/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
+  config.vm.provision "file", source: "C:/Users/USER/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+  config.vm.provision "file", source: "C:/Users/USER/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
+  config.vm.provision "file", source: "C:/Users/USER/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
   config.vm.provision "shell", inline: <<-EOC
     sudo sed -i -e "\\#PasswordAuthentication yes# s#PasswordAuthentication yes#PasswordAuthentication no#g" /etc/ssh/sshd_config
     sudo service ssh restart
@@ -18,6 +18,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       sudo apt-get update
       sudo apt-get install default-jre -y
       sudo apt-get install jenkins -y
+      sudo usermod -aG docker jenkins
+      sudo service jenkins restart
     SCRIPT
 
     $docker_script = <<-SCRIPT
@@ -48,5 +50,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     SCRIPT
 
   ## Config
-  
+  config.vm.define "jenkins" do |machine|
+    machine.vm.host_name="jenkins"
+    machine.vm.network :private_network, ip:"192.168.33.11"
+    machine.vm.provision "shell",inline: $jenkins_script
+    machine.vm.provision "shell",inline: $docker_script
+  end
 end
